@@ -7,7 +7,6 @@
 package com.bkk.cafe.util;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.bkk.cafe.exception.EntityCreationException;
-import com.bkk.cafe.exception.EntityNotFoundException;
 
 /**
  * Utility class for common entity operations.
@@ -48,7 +46,7 @@ public class EntityUtil {
 		T savedEntity = repository.save(entity);
 		if (savedEntity instanceof Identifiable && ((Identifiable) savedEntity).getId() == null) {
 			throw new EntityCreationException("Failed to create the " + entityName);
-		}
+		}		
 		return savedEntity;
 	}
 

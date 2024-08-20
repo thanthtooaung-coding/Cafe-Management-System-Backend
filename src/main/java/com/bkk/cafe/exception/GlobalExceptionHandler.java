@@ -34,11 +34,14 @@ public class GlobalExceptionHandler {
 
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
-	
+
 	@ExceptionHandler(DataIntegrityViolationException.class)
-	public ResponseEntity<Map<String, String>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+	public ResponseEntity<Map<String, String>> handleDataIntegrityViolationException(
+			DataIntegrityViolationException ex) {
 		Map<String, String> error = new HashMap<>();
-		error.put("error", "Database error: " + ex.getRootCause().getMessage());
+		Throwable rootCause = ex.getRootCause();
+		String errorMessage = rootCause != null ? rootCause.getMessage() : "Unknown database error";
+		error.put("error", "Database error: " + errorMessage);
 		return new ResponseEntity<>(error, HttpStatus.CONFLICT);
 	}
 

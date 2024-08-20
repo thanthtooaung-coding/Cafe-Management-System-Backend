@@ -44,7 +44,7 @@ public class EmployeeController {
 	@Operation(summary = "Create a new employee", description = "Create a new employee. The request body should contain all required fields such as staffId, name, position, email, phoneNumber, and hireDate. The response contains the success message and the status of the created employee.")
 	public ResponseEntity<ApiResponse<String>> createEmployee(@Valid @RequestBody EmployeeDto employeeDto) {
 		try {
-			logger.info("Creating employee with staffId: {}", employeeDto.getStaffId());
+			logger.info("Creating employee with Staff Id: {}", employeeDto.getStaffId());
 			EmployeeDto createdEmployee = employeeService.createEmployee(employeeDto);
 			logger.info("Employee created with ID: {}", createdEmployee.getId());
 			return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employee created successfully", "created");

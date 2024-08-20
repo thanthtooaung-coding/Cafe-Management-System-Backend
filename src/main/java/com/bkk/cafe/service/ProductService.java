@@ -13,11 +13,11 @@ import com.bkk.cafe.dto.ProductDto;
 public interface ProductService {
 	ProductDto createProduct(ProductDto productDto);
 
-	ProductDto getProductById(Long id);
+	ProductDto getProductByProductId(String productId);
 
 	List<ProductDto> getAllProducts();
 
-	ProductDto updateProduct(Long id, ProductDto productDto);
+	ProductDto updateProduct(String productId, ProductDto productDto);
 
-	void deleteProduct(Long id);
+	void deleteProduct(String productId);
 }
