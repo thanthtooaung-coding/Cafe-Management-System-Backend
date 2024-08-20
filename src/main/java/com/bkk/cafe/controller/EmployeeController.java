@@ -73,20 +73,20 @@ public class EmployeeController {
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employees fetched successfully", employees);
 	}
 
-	@PutMapping("/{id}")
+	@PutMapping("/{staffId}")
 	@Operation(summary = "Update an existing employee", description = "Update an existing employee. The response is updated Employee object with id, staffId, name, position, email, phoneNumber, hireDate.")
-	public ResponseEntity<ApiResponse<String>> updateEmployee(@PathVariable Long id,
-			@RequestBody EmployeeDto employeeDto) {
-		logger.info("Updating employee with ID: {}", id);
-		employeeService.updateEmployee(id, employeeDto);
+	public ResponseEntity<ApiResponse<String>> updateEmployee(@PathVariable String staffId,
+			@Valid @RequestBody EmployeeDto employeeDto) {
+		logger.info("Updating employee with Staff ID: {}", staffId);
+		employeeService.updateEmployee(staffId, employeeDto);
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employee updated successfully", "updated");
 	}
 
-	@DeleteMapping("/{id}")
-	@Operation(summary = "Delete an employee", description = "Delete an employee by their ID. The response contains a success message indicating that the employee was successfully deleted.")
-	public ResponseEntity<ApiResponse<String>> deleteEmployee(@PathVariable Long id) {
-		logger.info("Deleting employee with ID: {}", id);
-		employeeService.deleteEmployee(id);
+	@DeleteMapping("/{staffId}")
+	@Operation(summary = "Delete an employee", description = "Delete an employee by their Staff ID. The response contains a success message indicating that the employee was successfully deleted.")
+	public ResponseEntity<ApiResponse<String>> deleteEmployee(@PathVariable String staffId) {
+		logger.info("Deleting employee with Staff ID: {}", staffId);
+		employeeService.deleteEmployee(staffId);
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employee deleted successfully", "deleted");
 	}
 }

@@ -7,6 +7,7 @@
 package com.bkk.cafe.service.implement;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -41,21 +42,18 @@ public class EmployeeServiceImplement implements EmployeeService {
 			return DtoUtil.map(savedEmployee, EmployeeDto.class, modelMapper);
 		} catch (DataIntegrityViolationException e) {
 			logger.error("Database error while creating employee", e);
-			throw new RuntimeException("Database error: " + e.getRootCause().getMessage());
+			throw new RuntimeException("Database error: " + Objects.requireNonNull(e.getRootCause()).getMessage());
 		} catch (Exception e) {
-			logger.error("Error creating employee", e);
-			throw new RuntimeException("Error creating employee: " + e.getMessage());
+			logger.error("Unexpected error creating employee", e);
+			throw new RuntimeException("Unexpected error creating employee: " + e.getMessage());
 		}
 	}
 
 	@Override
 	public EmployeeDto getEmployeeByStaffId(String staffId) {
-		Employee employee = employeeRepository.findEmployeeByStaffId(staffId);
-		if(employee == null) {
-			throw new EntityNotFoundException("Employee not found with Staff ID: " + staffId);
-		} else {
-			employee.setId(null);
-		}
+		Employee employee = employeeRepository.findEmployeeByStaffId(staffId)
+				.orElseThrow(() -> new EntityNotFoundException("Employee not found with Staff ID: " + staffId));
+		employee.setId(null);
 		return DtoUtil.map(employee, EmployeeDto.class, modelMapper);
 	}
 
@@ -66,15 +64,22 @@ public class EmployeeServiceImplement implements EmployeeService {
 	}
 
 	@Override
-	public EmployeeDto updateEmployee(Long id, EmployeeDto employeeDto) {
-		Employee existingEmployee = EntityUtil.getEntityById(employeeRepository, id, "Employee");
+	public EmployeeDto updateEmployee(String staffId, EmployeeDto employeeDto) {
+		Employee existingEmployee = employeeRepository.findEmployeeByStaffId(staffId)
+				.orElseThrow(() -> new EntityNotFoundException("Employee not found with Staff ID: " + staffId));
+		Long id = existingEmployee.getId();
 		modelMapper.map(employeeDto, existingEmployee);
+		existingEmployee.setId(id);
 		Employee updatedEmployee = employeeRepository.save(existingEmployee);
+		updatedEmployee.setId(null);
 		return DtoUtil.map(updatedEmployee, EmployeeDto.class, modelMapper);
 	}
 
 	@Override
-	public void deleteEmployee(Long id) {
-		EntityUtil.deleteEntity(employeeRepository, id, "Employee");
+	public void deleteEmployee(String staffId) {
+		Employee employee = employeeRepository.findEmployeeByStaffId(staffId)
+				.orElseThrow(() -> new EntityNotFoundException("Employee not found with Staff ID: " + staffId));
+
+		employeeRepository.delete(employee);
 	}
 }

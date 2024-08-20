@@ -10,6 +10,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.bkk.cafe.exception.EntityCreationException;
@@ -19,6 +21,8 @@ import com.bkk.cafe.exception.EntityNotFoundException;
  * Utility class for common entity operations.
  */
 public class EntityUtil {
+
+	private static final Logger logger = LoggerFactory.getLogger(EntityUtil.class);
 
 	/**
 	 * Saves an entity using the provided repository and checks if the entity was
@@ -65,76 +69,16 @@ public class EntityUtil {
 	 */
 	public static <T> List<T> getAllEntities(JpaRepository<T, Long> repository) {
 		List<T> entities = repository.findAll();
-		if (entities != null) {
-			for (T entity : entities) {
-				try {
-					Field idField = entity.getClass().getDeclaredField("id");
-					idField.setAccessible(true);
-					idField.set(entity, null);
-				} catch (NoSuchFieldException | IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			}
-		} else {
-			entities = new ArrayList<>();
-		}
-		return entities;
-	}
-
-	/**
-	 * Retrieves an entity by its ID from the repository and throws an exception if
-	 * not found.
-	 *
-	 * Example Usage:
-	 * 
-	 * <pre>
-	 * {@code
-	 * User user = EntityUtil.getEntityById(userRepository, userDto.getId(), "User");
-	 * }
-	 * </pre>
-	 *
-	 * @param repository the repository for the entity
-	 * @param id         the ID of the entity
-	 * @param <T>        the type of the entity
-	 * @return the retrieved entity with its ID set to null
-	 */
-	public static <T> T getEntityById(JpaRepository<T, Long> repository, Long id, String entityName) {
-		T entity = id > 0 ? repository.findById(id).orElse(null) : null;
-		if (entity == null) {
-			throw new EntityNotFoundException(entityName + " not found with ID: " + id);
-		}
-		try {
-			Field idField = entity.getClass().getDeclaredField("id");
-			idField.setAccessible(true);
-			idField.set(entity, null);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			throw new RuntimeException("Failed to set ID to null for entity: " + entityName, e);
-		}
-		return entity;
-	}
-
-	/**
-	 * Deletes an entity by its ID from the repository and throws an exception if
-	 * not found.
-	 *
-	 * Example Usage:
-	 * 
-	 * <pre>
-	 * {@code
-	 * EntityUtil.deleteEntity(userRepository, userDto.getId(), "User");
-	 * }
-	 * </pre>
-	 *
-	 * @param repository the repository for the entity
-	 * @param id         the ID of the entity to delete
-	 * @param entityName the name of the entity
-	 * @param <T>        the type of the entity
-	 */
-	public static <T> void deleteEntity(JpaRepository<T, Long> repository, Long id, String entityName) {
-		if (!repository.existsById(id)) {
-			throw new EntityNotFoundException(entityName + " not found with ID: " + id);
-		}
-		repository.deleteById(id);
+        for (T entity : entities) {
+            try {
+                Field idField = entity.getClass().getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(entity, null);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                logger.error("Failed to set ID field to null for entity: {}", entity.getClass().getName(), e);
+            }
+        }
+        return entities;
 	}
 
 	/**
