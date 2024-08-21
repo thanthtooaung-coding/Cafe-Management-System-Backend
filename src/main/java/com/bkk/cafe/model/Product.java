@@ -8,9 +8,12 @@ package com.bkk.cafe.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.bkk.cafe.util.ProductStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,6 +24,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -66,6 +70,9 @@ public class Product {
 	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
 
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<ProductVariant> variants = new HashSet<>();
+
 	@PrePersist
 	protected void onCreate() {
 		createdAt = LocalDateTime.now();
@@ -76,5 +83,4 @@ public class Product {
 	protected void onUpdate() {
 		updatedAt = LocalDateTime.now();
 	}
-
 }

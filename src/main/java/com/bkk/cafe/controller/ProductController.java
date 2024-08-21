@@ -40,15 +40,10 @@ public class ProductController {
     @PostMapping
 	@Operation(summary = "Create a new product", description = "Create a new product. The request body should contain all required fields such as productId, name, description, price, quantity, and status. The response contains the success message and the status of the created product.")
 	public ResponseEntity<ApiResponse<String>> createProduct(@Valid @RequestBody ProductDto productDto) {
-		try {
-			logger.info("Creating product with Product Id: {}", productDto.getProductId());
-			ProductDto createdProduct = productService.createProduct(productDto);
-			logger.info("Product created with ID: {}", createdProduct.getId());
-			return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Product created successfully", "created");
-		} catch (RuntimeException e) {
-			logger.error("Error creating product", e);
-			return ResponseUtil.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create product", e.getMessage());
-		}
+		logger.info("Creating product with Product Id: {}", productDto.getProductId());
+		ProductDto createdProduct = productService.createProduct(productDto);
+		logger.info("Product created with ID: {}", createdProduct.getId());
+		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Product created successfully", "created");
 	}
 
     @GetMapping("/{productId}")

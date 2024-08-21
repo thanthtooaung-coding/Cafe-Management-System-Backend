@@ -7,6 +7,7 @@
 package com.bkk.cafe.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.bkk.cafe.util.ProductStatus;
 
@@ -44,4 +45,8 @@ public class ProductDto {
 
 	@NotNull(message = "Status is required")
 	private ProductStatus status;
+
+	private Long categoryId;
+
+	private List<ProductVariantDto> variants;
 }

@@ -1,0 +1,27 @@
+[
+	{
+		"variantName": "Small",
+		"price": 2.50,
+		"quantity": 25
+	},
+	{
+		"variantName": "Medium",
+		"price": 3.00,
+		"quantity": 30
+	},
+	{
+		"variantName": "Large",
+		"price": 3.50,
+		"quantity": 25
+	},
+	{
+		"variantName": "Regular",
+		"price": 6.00,
+		"quantity": 30
+	},
+	{
+		"variantName": "Slice",
+		"price": 5.00,
+		"quantity": 40
+	}
+]

@@ -43,15 +43,10 @@ public class EmployeeController {
 	@PostMapping
 	@Operation(summary = "Create a new employee", description = "Create a new employee. The request body should contain all required fields such as staffId, name, position, email, phoneNumber, and hireDate. The response contains the success message and the status of the created employee.")
 	public ResponseEntity<ApiResponse<String>> createEmployee(@Valid @RequestBody EmployeeDto employeeDto) {
-		try {
-			logger.info("Creating employee with Staff Id: {}", employeeDto.getStaffId());
-			EmployeeDto createdEmployee = employeeService.createEmployee(employeeDto);
-			logger.info("Employee created with ID: {}", createdEmployee.getId());
-			return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employee created successfully", "created");
-		} catch (RuntimeException e) {
-			logger.error("Error creating employee", e);
-			return ResponseUtil.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create employee", e.getMessage());
-		}
+		logger.info("Creating employee with Staff Id: {}", employeeDto.getStaffId());
+		EmployeeDto createdEmployee = employeeService.createEmployee(employeeDto);
+		logger.info("Employee created with ID: {}", createdEmployee.getId());
+		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employee created successfully", "created");
 	}
 
 	@GetMapping("/{staffId}")

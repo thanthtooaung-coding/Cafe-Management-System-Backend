@@ -1,0 +1,112 @@
+[
+	{
+		"productId": "MILK_TEA_001",
+		"name": "Milk Tea",
+		"description": "Delicious milk tea with various sizes.",
+		"price": 4.00,
+		"quantity": 100,
+		"status": "AVAILABLE",
+		"categoryId": 1,
+		"variants": [
+			{
+				"variantName": "S",
+				"price": 3.50,
+				"quantity": 30
+			},
+			{
+				"variantName": "M",
+				"price": 4.00,
+				"quantity": 40
+			},
+			{
+				"variantName": "L",
+				"price": 4.50,
+				"quantity": 30
+			}
+		]
+	},
+	{
+		"productId": "COFFEE_001",
+		"name": "Coffee",
+		"description": "Strong and rich coffee.",
+		"price": 3.00,
+		"quantity": 80,
+		"status": "AVAILABLE",
+		"categoryId": 1,
+		"variants": [
+			{
+				"variantName": "Small",
+				"price": 2.50,
+				"quantity": 25
+			},
+			{
+				"variantName": "Medium",
+				"price": 3.00,
+				"quantity": 30
+			},
+			{
+				"variantName": "Large",
+				"price": 3.50,
+				"quantity": 25
+			}
+		]
+	},
+	{
+		"productId": "COOKIE_001",
+		"name": "Chocolate Chip Cookie",
+		"description": "Crunchy chocolate chip cookies.",
+		"price": 1.50,
+		"quantity": 200,
+		"status": "AVAILABLE",
+		"categoryId": 2,
+		"variants": [
+			{
+				"variantName": "Single",
+				"price": 1.50,
+				"quantity": 50
+			},
+			{
+				"variantName": "Pack of 5",
+				"price": 7.00,
+				"quantity": 30
+			}
+		]
+	},
+	{
+		"productId": "SANDWICH_001",
+		"name": "Club Sandwich",
+		"description": "Classic club sandwich with fresh ingredients.",
+		"price": 6.00,
+		"quantity": 50,
+		"status": "AVAILABLE",
+		"categoryId": 4,
+		"variants": [
+			{
+				"variantName": "Regular",
+				"price": 6.00,
+				"quantity": 30
+			},
+			{
+				"variantName": "Large",
+				"price": 7.50,
+				"quantity": 20
+			}
+		]
+	},
+	{
+		"productId": "CAKE_001",
+		"name": "Cheesecake",
+		"description": "Rich and creamy cheesecake.",
+		"price": 5.00,
+		"quantity": 40,
+		"status": "AVAILABLE",
+		"categoryId": 3,
+		"variants": [
+			{
+				"variantName": "Slice",
+				"price": 5.00,
+				"quantity": 40
+			}
+		]
+	}
+]

@@ -7,16 +7,15 @@
 package com.bkk.cafe.service.implement;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.bkk.cafe.dto.EmployeeDto;
+import com.bkk.cafe.exception.EntityAlreadyExistsException;
 import com.bkk.cafe.exception.EntityNotFoundException;
 import com.bkk.cafe.model.Employee;
 import com.bkk.cafe.repository.EmployeeRepository;
@@ -37,12 +36,16 @@ public class EmployeeServiceImplement implements EmployeeService {
 	@Override
 	public EmployeeDto createEmployee(EmployeeDto employeeDto) {
 		try {
+			if (employeeRepository.existsByEmail(employeeDto.getEmail())) {
+				String errorMessage = "Employee with email '" + employeeDto.getEmail() + "' already exists";
+				logger.error(errorMessage);
+				throw new EntityAlreadyExistsException(errorMessage);
+			}
 			Employee employee = DtoUtil.map(employeeDto, Employee.class, modelMapper);
 			Employee savedEmployee = EntityUtil.saveEntity(employeeRepository, employee, "Employee");
 			return DtoUtil.map(savedEmployee, EmployeeDto.class, modelMapper);
-		} catch (DataIntegrityViolationException e) {
-			logger.error("Database error while creating employee", e);
-			throw new RuntimeException("Database error: " + Objects.requireNonNull(e.getRootCause()).getMessage());
+		} catch (EntityAlreadyExistsException e) {
+			throw e;
 		} catch (Exception e) {
 			logger.error("Unexpected error creating employee", e);
 			throw new RuntimeException("Unexpected error creating employee: " + e.getMessage());

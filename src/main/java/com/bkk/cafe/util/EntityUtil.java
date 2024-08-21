@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.bkk.cafe.exception.EntityCreationException;
+import com.bkk.cafe.exception.EntityNotFoundException;
 
 /**
  * Utility class for common entity operations.
@@ -46,7 +47,7 @@ public class EntityUtil {
 		T savedEntity = repository.save(entity);
 		if (savedEntity instanceof Identifiable && ((Identifiable) savedEntity).getId() == null) {
 			throw new EntityCreationException("Failed to create the " + entityName);
-		}		
+		}
 		return savedEntity;
 	}
 
@@ -67,16 +68,42 @@ public class EntityUtil {
 	 */
 	public static <T> List<T> getAllEntities(JpaRepository<T, Long> repository) {
 		List<T> entities = repository.findAll();
-        for (T entity : entities) {
-            try {
-                Field idField = entity.getClass().getDeclaredField("id");
-                idField.setAccessible(true);
-                idField.set(entity, null);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                logger.error("Failed to set ID field to null for entity: {}", entity.getClass().getName(), e);
-            }
-        }
-        return entities;
+		for (T entity : entities) {
+			try {
+				Field idField = entity.getClass().getDeclaredField("id");
+				idField.setAccessible(true);
+				idField.set(entity, null);
+			} catch (NoSuchFieldException | IllegalAccessException e) {
+				logger.error("Failed to set ID field to null for entity: {}", entity.getClass().getName(), e);
+			}
+		}
+		return entities;
+	}
+
+	/**
+	 * Retrieves an entity by its ID from the repository and throws an exception if
+	 * not found.
+	 *
+	 * Example Usage:
+	 * 
+	 * <pre>
+	 * {@code
+	 * User user = EntityUtil.getEntityById(userRepository, userDto.getId(), "User");
+	 * }
+	 * </pre>
+	 *
+	 * @param repository the repository for the entity
+	 * @param id         the ID of the entity
+	 * @param entityName the name of the entity type for the exception message
+	 * @param <T>        the type of the entity
+	 * @return the retrieved entity
+	 */
+	public static <T> T getEntityById(JpaRepository<T, Long> repository, Long id, String entityName) {
+		T entity = id > 0 ? repository.findById(id).orElse(null) : null;
+		if (entity == null) {
+			throw new EntityNotFoundException(entityName + " not found with ID: " + id);
+		}
+		return entity;
 	}
 
 	/**
