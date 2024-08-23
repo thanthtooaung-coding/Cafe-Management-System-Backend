@@ -51,6 +51,7 @@ public class ProductController {
     public ResponseEntity<ApiResponse<ProductDto>> getProductById(@PathVariable String productId) {
 		logger.info("Fetching product with Product ID: {}", productId);
         ProductDto product = productService.getProductByProductId(productId);
+        logger.info("Product with Product ID: {} fetched successfully", productId);
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Product fetched successfully", product);
 	}
 

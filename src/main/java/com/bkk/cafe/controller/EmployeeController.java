@@ -54,6 +54,7 @@ public class EmployeeController {
 	public ResponseEntity<ApiResponse<EmployeeDto>> getEmployeeById(@PathVariable String staffId) {
 		logger.info("Fetching employee with Staff ID: {}", staffId);
 		EmployeeDto employee = employeeService.getEmployeeByStaffId(staffId);
+		logger.info("Employee with Staff ID: {} fetched successfully", staffId);
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employee fetched successfully", employee);
 	}
 
@@ -62,9 +63,10 @@ public class EmployeeController {
 	public ResponseEntity<ApiResponse<List<EmployeeDto>>> getAllEmployees() {
 		logger.info("Fetching all employees");
 		List<EmployeeDto> employees = employeeService.getAllEmployees();
-		if (employees.isEmpty()) {
+		if (employees.isEmpty()) {logger.info("Employees fetched successfully. Total employees: {}", employees.size());
 			return ResponseUtil.createSuccessResponse(HttpStatus.OK, "No employees found", new ArrayList<>());
 		}
+		logger.info("Employees fetched successfully. Total employees: {}", employees.size());
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employees fetched successfully", employees);
 	}
 
@@ -72,16 +74,18 @@ public class EmployeeController {
 	@Operation(summary = "Update an existing employee", description = "Update an existing employee. The response is updated Employee object with id, staffId, name, position, email, phoneNumber, hireDate.")
 	public ResponseEntity<ApiResponse<String>> updateEmployee(@PathVariable String staffId,
 			@Valid @RequestBody EmployeeDto employeeDto) {
-		logger.info("Updating employee with Staff ID: {}", staffId);
+		logger.info("Request received to update employee with Staff ID: {}", staffId);
 		employeeService.updateEmployee(staffId, employeeDto);
+		logger.info("Employee with Staff ID: {} updated successfully", staffId);
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employee updated successfully", "updated");
 	}
 
 	@DeleteMapping("/{staffId}")
 	@Operation(summary = "Delete an employee", description = "Delete an employee by their Staff ID. The response contains a success message indicating that the employee was successfully deleted.")
 	public ResponseEntity<ApiResponse<String>> deleteEmployee(@PathVariable String staffId) {
-		logger.info("Deleting employee with Staff ID: {}", staffId);
+		logger.info("Request received to delete employee with Staff ID: {}", staffId);
 		employeeService.deleteEmployee(staffId);
+		logger.info("Employee with Staff ID: {} deleted successfully", staffId);
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employee deleted successfully", "deleted");
 	}
 }

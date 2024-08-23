@@ -54,35 +54,49 @@ public class EmployeeServiceImplement implements EmployeeService {
 
 	@Override
 	public EmployeeDto getEmployeeByStaffId(String staffId) {
-		Employee employee = employeeRepository.findEmployeeByStaffId(staffId)
-				.orElseThrow(() -> new EntityNotFoundException("Employee not found with Staff ID: " + staffId));
+		logger.debug("Attempting to retrieve employee with Staff ID: {}", staffId);
+		Employee employee = employeeRepository.findEmployeeByStaffId(staffId).orElseThrow(() -> {
+			logger.error("Employee not found with Staff ID: {}", staffId);
+			return new EntityNotFoundException("Employee not found with Staff ID: " + staffId);
+		});
+
 		employee.setId(null);
 		return DtoUtil.map(employee, EmployeeDto.class, modelMapper);
 	}
 
 	@Override
 	public List<EmployeeDto> getAllEmployees() {
+		logger.debug("Attempting to retrieve all employees from the database");
 		List<Employee> employees = EntityUtil.getAllEntities(employeeRepository);
+		logger.debug("Successfully retrieved {} employees from the database", employees.size());
 		return DtoUtil.mapList(employees, EmployeeDto.class, modelMapper);
 	}
 
 	@Override
 	public EmployeeDto updateEmployee(String staffId, EmployeeDto employeeDto) {
-		Employee existingEmployee = employeeRepository.findEmployeeByStaffId(staffId)
-				.orElseThrow(() -> new EntityNotFoundException("Employee not found with Staff ID: " + staffId));
+		logger.debug("Attempting to update employee with Staff ID: {}", staffId);
+		Employee existingEmployee = employeeRepository.findEmployeeByStaffId(staffId).orElseThrow(() -> {
+			logger.error("Employee not found with Staff ID: {}", staffId);
+			return new EntityNotFoundException("Employee not found with Staff ID: " + staffId);
+		});
+		logger.debug("Mapping new data to the existing employee with Staff ID: {}", staffId);
 		Long id = existingEmployee.getId();
 		modelMapper.map(employeeDto, existingEmployee);
 		existingEmployee.setId(id);
 		Employee updatedEmployee = employeeRepository.save(existingEmployee);
+		logger.debug("Employee with Staff ID: {} updated in the database", staffId);
 		updatedEmployee.setId(null);
 		return DtoUtil.map(updatedEmployee, EmployeeDto.class, modelMapper);
 	}
 
 	@Override
 	public void deleteEmployee(String staffId) {
-		Employee employee = employeeRepository.findEmployeeByStaffId(staffId)
-				.orElseThrow(() -> new EntityNotFoundException("Employee not found with Staff ID: " + staffId));
-
+		logger.debug("Attempting to delete employee with Staff ID: {}", staffId);
+		Employee employee = employeeRepository.findEmployeeByStaffId(staffId).orElseThrow(() -> {
+			logger.error("Employee not found with Staff ID: {}", staffId);
+			return new EntityNotFoundException("Employee not found with Staff ID: " + staffId);
+		});
 		employeeRepository.delete(employee);
+		logger.debug("Employee with Staff ID: {} deleted from the database", staffId);
 	}
 }

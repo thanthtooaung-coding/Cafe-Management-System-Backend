@@ -52,6 +52,16 @@ public class GlobalExceptionHandler {
 		return ResponseUtil.createErrorResponse(HttpStatus.CONFLICT, "Entity already exists", ex.getMessage());
 	}
 
+	@ExceptionHandler(UnsupportedOperationException.class)
+	public ResponseEntity<ApiResponse<String>> handleUnsupportedOperationException(UnsupportedOperationException ex) {
+		return ResponseUtil.createErrorResponse(HttpStatus.NOT_IMPLEMENTED, "Unimplemented method", ex.getMessage());
+	}
+
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ResponseEntity<ApiResponse<String>> handleEntityNotFoundException(EntityNotFoundException ex) {
+		return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Entity not found", ex.getMessage());
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiResponse<String>> handleGlobalExceptions(Exception ex) {
 		return ResponseUtil.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred",

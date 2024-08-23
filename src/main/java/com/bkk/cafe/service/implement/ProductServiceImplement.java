@@ -8,6 +8,7 @@ package com.bkk.cafe.service.implement;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.bkk.cafe.dto.ProductDto;
 import com.bkk.cafe.exception.EntityAlreadyExistsException;
+import com.bkk.cafe.exception.EntityNotFoundException;
 import com.bkk.cafe.model.Category;
 import com.bkk.cafe.model.Product;
 import com.bkk.cafe.model.ProductVariant;
@@ -32,6 +34,7 @@ import com.bkk.cafe.util.EntityUtil;
 import jakarta.transaction.Transactional;
 
 @Service
+@Transactional
 public class ProductServiceImplement implements ProductService {
 	@Autowired
 	private ProductRepository productRepository;
@@ -56,17 +59,16 @@ public class ProductServiceImplement implements ProductService {
 		Product product = DtoUtil.map(productDto, Product.class, modelMapper);
 		product.setCategory(category);
 		product.setProductId(generateProductId(product.getCategory()));
-		Product savedProduct = EntityUtil.saveEntity(productRepository, product, "Product");
 		if (productDto.getVariants() != null) {
 			List<ProductVariant> variants = productDto.getVariants().stream().map(variantDto -> {
 				ProductVariant variant = DtoUtil.map(variantDto, ProductVariant.class, modelMapper);
-				variant.setProduct(savedProduct);
+				variant.setProduct(product);
 				return variant;
 			}).collect(Collectors.toList());
-//			productVariantRepository.saveAll(variants);
-			savedProduct.getVariants().addAll(variants);
-			productRepository.save(savedProduct);
+			product.setVariants(new HashSet<>(variants));
 		}
+
+		Product savedProduct = EntityUtil.saveEntity(productRepository, product, "Product");
 		return DtoUtil.map(savedProduct, ProductDto.class, modelMapper);
 	}
 
@@ -85,8 +87,18 @@ public class ProductServiceImplement implements ProductService {
 
 	@Override
 	public ProductDto getProductByProductId(String productId) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getProductById'");
+		logger.debug("Attempting to retrieve product with Product ID: {}", productId);
+
+		Product product = productRepository.findProductByProductId(productId).orElseThrow(() -> {
+			logger.error("Product not found with Product ID: {}", productId);
+			return new EntityNotFoundException("Product not found with Product ID: " + productId);
+		});
+
+		ProductDto productDto = DtoUtil.map(product, ProductDto.class, modelMapper);
+		productDto.setId(null);
+
+		logger.debug("Successfully retrieved product with Product ID: {}", productId);
+		return productDto;
 	}
 
 	@Override
