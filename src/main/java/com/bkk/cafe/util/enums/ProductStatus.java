@@ -4,7 +4,7 @@
  * @Time : 11:26 AM
  * @Project_Name : cafe
  */
-package com.bkk.cafe.util;
+package com.bkk.cafe.util.enums;
 
 public enum ProductStatus {
 	ACTIVE, DISCONTINUED, OUT_OF_STOCK, PENDING

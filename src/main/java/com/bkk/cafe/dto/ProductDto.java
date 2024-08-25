@@ -9,7 +9,7 @@ package com.bkk.cafe.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.bkk.cafe.util.ProductStatus;
+import com.bkk.cafe.util.enums.ProductStatus;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;

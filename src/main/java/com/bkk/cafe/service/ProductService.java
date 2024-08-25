@@ -13,7 +13,7 @@ import com.bkk.cafe.dto.ProductDto;
 public interface ProductService {
 	ProductDto createProduct(ProductDto productDto);
 
-	ProductDto getProductByProductId(String productId);
+	Object getProductByProductId(String productId, boolean fromMenuService);
 
 	List<ProductDto> getAllProducts();
 

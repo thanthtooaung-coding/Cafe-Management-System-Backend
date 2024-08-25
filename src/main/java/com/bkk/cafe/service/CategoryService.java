@@ -13,4 +13,5 @@ import com.bkk.cafe.dto.CategoryDto;
 public interface CategoryService {
 	CategoryDto createCategory(CategoryDto categoryDto);
 	List<CategoryDto> getAllCategories();
+	Object getCategoryById(Long id, boolean fromMenuService);
 }

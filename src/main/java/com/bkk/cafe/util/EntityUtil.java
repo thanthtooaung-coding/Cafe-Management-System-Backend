@@ -101,6 +101,7 @@ public class EntityUtil {
 	public static <T> T getEntityById(JpaRepository<T, Long> repository, Long id, String entityName) {
 		T entity = id > 0 ? repository.findById(id).orElse(null) : null;
 		if (entity == null) {
+			logger.error("{} not found with ID: {}", entityName, id);
 			throw new EntityNotFoundException(entityName + " not found with ID: " + id);
 		}
 		return entity;

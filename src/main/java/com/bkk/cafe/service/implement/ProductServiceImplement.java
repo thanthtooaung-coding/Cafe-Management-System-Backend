@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.bkk.cafe.service.CategoryService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,40 +37,46 @@ import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ProductServiceImplement implements ProductService {
-	@Autowired
-	private ProductRepository productRepository;
+	private final ProductRepository productRepository;
 
-	@Autowired
-	private CategoryRepository categoryRepository;
+	private final CategoryService categoryService;
 
-	@Autowired
-	private ModelMapper modelMapper;
+	private final ModelMapper modelMapper;
 
 	private final Logger logger = LoggerFactory.getLogger(ProductServiceImplement.class);
 
 	@Override
 	@Transactional
 	public ProductDto createProduct(ProductDto productDto) {
+		logger.debug("Attempting to create a new product with Product Name: {}", productDto.getName());
+
+		logger.debug("Checking if an product with name '{}' already exists", productDto.getName());
 		if (productRepository.existsByName(productDto.getName())) {
 			String errorMessage = "Product with name '" + productDto.getName() + "' already exists";
 			logger.error(errorMessage);
 			throw new EntityAlreadyExistsException(errorMessage);
 		}
-		Category category = EntityUtil.getEntityById(categoryRepository, productDto.getCategoryId(), "Category");
+
+		Category category = (Category) categoryService.getCategoryById(productDto.getCategoryId(), false);
+
 		Product product = DtoUtil.map(productDto, Product.class, modelMapper);
 		product.setCategory(category);
 		product.setProductId(generateProductId(product.getCategory()));
+		logger.debug("Saving new product with Product ID: {} to the database", productDto.getProductId());
+
 		if (productDto.getVariants() != null) {
 			List<ProductVariant> variants = productDto.getVariants().stream().map(variantDto -> {
 				ProductVariant variant = DtoUtil.map(variantDto, ProductVariant.class, modelMapper);
 				variant.setProduct(product);
 				return variant;
-			}).collect(Collectors.toList());
+			}).toList();
 			product.setVariants(new HashSet<>(variants));
 		}
 
 		Product savedProduct = EntityUtil.saveEntity(productRepository, product, "Product");
+		logger.debug("Product with Product ID: {} successfully created with ID: {}", savedProduct.getProductId(), savedProduct.getId());
 		return DtoUtil.map(savedProduct, ProductDto.class, modelMapper);
 	}
 
@@ -86,18 +94,23 @@ public class ProductServiceImplement implements ProductService {
 	}
 
 	@Override
-	public ProductDto getProductByProductId(String productId) {
+	public Object getProductByProductId(String productId, boolean fromMenuService) {
 		logger.debug("Attempting to retrieve product with Product ID: {}", productId);
 
 		Product product = productRepository.findProductByProductId(productId).orElseThrow(() -> {
 			logger.error("Product not found with Product ID: {}", productId);
 			return new EntityNotFoundException("Product not found with Product ID: " + productId);
 		});
+		String successMessage = "Successfully retrieved product with Product ID: " + productId;
+		if(fromMenuService) {
+			logger.debug(successMessage);
+			return product;
+		}
 
 		ProductDto productDto = DtoUtil.map(product, ProductDto.class, modelMapper);
 		productDto.setId(null);
 
-		logger.debug("Successfully retrieved product with Product ID: {}", productId);
+		logger.debug(successMessage);
 		return productDto;
 	}
 

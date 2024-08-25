@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.bkk.cafe.util.ProductStatus;
+import com.bkk.cafe.util.enums.ProductStatus;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

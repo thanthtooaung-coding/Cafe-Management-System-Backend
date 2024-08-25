@@ -40,9 +40,9 @@ public class ProductController {
     @PostMapping
 	@Operation(summary = "Create a new product", description = "Create a new product. The request body should contain all required fields such as productId, name, description, price, quantity, and status. The response contains the success message and the status of the created product.")
 	public ResponseEntity<ApiResponse<String>> createProduct(@Valid @RequestBody ProductDto productDto) {
-		logger.info("Creating product with Product Id: {}", productDto.getProductId());
+		logger.info("Received request to create product with Product Name: {}", productDto.getName());
 		ProductDto createdProduct = productService.createProduct(productDto);
-		logger.info("Product created with ID: {}", createdProduct.getId());
+		logger.info("Product created successfully with Product ID: {}", createdProduct.getProductId());
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Product created successfully", "created");
 	}
 
@@ -50,7 +50,7 @@ public class ProductController {
     @Operation(summary = "Get product by Product ID", description = "Retrieve an product's details by their Product ID. The response contains the product's information, including id, productId, name, description, price, quantity, and status.")
     public ResponseEntity<ApiResponse<ProductDto>> getProductById(@PathVariable String productId) {
 		logger.info("Fetching product with Product ID: {}", productId);
-        ProductDto product = productService.getProductByProductId(productId);
+        ProductDto product = (ProductDto) productService.getProductByProductId(productId, false);
         logger.info("Product with Product ID: {} fetched successfully", productId);
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Product fetched successfully", product);
 	}

@@ -40,9 +40,9 @@ public class CategoryController {
 	@PostMapping
 	@Operation(summary = "Create a new category", description = "Create a new category. The request body should contain all required fields such as id and name. The response contains the success message and the status of the created category.")
 	public ResponseEntity<ApiResponse<String>> createCategory(@Valid @RequestBody CategoryDto categoryDto) {
-		logger.info("Creating category with Name: {}", categoryDto.getName());
+		logger.info("Received request to create category with Name: {}", categoryDto.getName());
 		CategoryDto createdCategory = categoryService.createCategory(categoryDto);
-		logger.info("Category created with ID: {}", createdCategory.getId());
+		logger.info("Category created successfully with Name: {}", createdCategory.getName());
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Category created successfully", "created");
 	}
 	
@@ -52,8 +52,10 @@ public class CategoryController {
 		logger.info("Fetching all categories");
 		List<CategoryDto> categories = categoryService.getAllCategories();
 		if (categories.isEmpty()) {
+			logger.info("Categories fetched successfully. Total categories: {}", 0);
 			return ResponseUtil.createSuccessResponse(HttpStatus.OK, "No categories found", new ArrayList<>());
 		}
+		logger.info("Categories fetched successfully. Total categories: {}", categories.size());
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Categories fetched successfully", categories);
 	}
 }

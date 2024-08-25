@@ -43,9 +43,9 @@ public class EmployeeController {
 	@PostMapping
 	@Operation(summary = "Create a new employee", description = "Create a new employee. The request body should contain all required fields such as staffId, name, position, email, phoneNumber, and hireDate. The response contains the success message and the status of the created employee.")
 	public ResponseEntity<ApiResponse<String>> createEmployee(@Valid @RequestBody EmployeeDto employeeDto) {
-		logger.info("Creating employee with Staff Id: {}", employeeDto.getStaffId());
+		logger.info("Received request to create employee with Staff ID: {}", employeeDto.getStaffId());
 		EmployeeDto createdEmployee = employeeService.createEmployee(employeeDto);
-		logger.info("Employee created with ID: {}", createdEmployee.getId());
+		logger.info("Employee created successfully with Staff ID: {}", createdEmployee.getStaffId());
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employee created successfully", "created");
 	}
 
@@ -63,7 +63,8 @@ public class EmployeeController {
 	public ResponseEntity<ApiResponse<List<EmployeeDto>>> getAllEmployees() {
 		logger.info("Fetching all employees");
 		List<EmployeeDto> employees = employeeService.getAllEmployees();
-		if (employees.isEmpty()) {logger.info("Employees fetched successfully. Total employees: {}", employees.size());
+		if (employees.isEmpty()) {
+			logger.info("Employees fetched successfully. Total employees: {}", 0);
 			return ResponseUtil.createSuccessResponse(HttpStatus.OK, "No employees found", new ArrayList<>());
 		}
 		logger.info("Employees fetched successfully. Total employees: {}", employees.size());

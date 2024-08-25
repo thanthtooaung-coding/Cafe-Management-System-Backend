@@ -8,6 +8,8 @@ package com.bkk.cafe.service.implement;
 
 import java.util.List;
 
+import com.bkk.cafe.exception.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,25 +25,30 @@ import com.bkk.cafe.util.DtoUtil;
 import com.bkk.cafe.util.EntityUtil;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImplement implements CategoryService {
-	@Autowired
-	private CategoryRepository categoryRepository;
-	
-	@Autowired
-	private ModelMapper modelMapper;
+	private final CategoryRepository categoryRepository;
+
+	private final ModelMapper modelMapper;
 	
 	private final Logger logger = LoggerFactory.getLogger(CategoryServiceImplement.class);
 	
 	@Override
 	public CategoryDto createCategory(CategoryDto categoryDto) {
 		try {
+			logger.debug("Attempting to create a new category with Name: {}", categoryDto.getName());
+
+			logger.debug("Checking if an category with name '{}' already exists", categoryDto.getName());
 			if (categoryRepository.existsByName(categoryDto.getName())) {
 				String errorMessage = "Category with name '" + categoryDto.getName() + "' already exists";
 				logger.error(errorMessage);
 				throw new EntityAlreadyExistsException(errorMessage);
 			}
 			Category category = DtoUtil.map(categoryDto, Category.class, modelMapper);
+
+			logger.debug("Saving new category with Name: {} to the database", categoryDto.getName());
 			Category savedCategory = EntityUtil.saveEntity(categoryRepository, category, "Category");
+			logger.debug("Category with Name: {} successfully created with ID: {}", savedCategory.getName(), savedCategory.getId());
 			return DtoUtil.map(savedCategory, CategoryDto.class, modelMapper);
 		} catch (EntityAlreadyExistsException e) {
 			throw e;
@@ -53,7 +60,22 @@ public class CategoryServiceImplement implements CategoryService {
 
 	@Override
 	public List<CategoryDto> getAllCategories() {
-		List<Category> categorys = EntityUtil.getAllEntities(categoryRepository);
-		return DtoUtil.mapList(categorys, CategoryDto.class, modelMapper);
+		logger.debug("Attempting to retrieve all categories from the database");
+		List<Category> categories = EntityUtil.getAllEntities(categoryRepository);
+		logger.debug("Successfully retrieved {} categories from the database", categories.size());
+//		List<CategoryDto> categoryDtos = DtoUtil.mapList(categories, CategoryDto.class, modelMapper);
+//		categoryDtos.forEach(dto -> dto.setId(null));
+		return DtoUtil.mapList(categories, CategoryDto.class, modelMapper);
+	}
+
+	@Override
+	public Object getCategoryById(Long id, boolean fromMenuService) {
+		logger.debug("Attempting to retrieve category with ID: {}", id);
+		Category category = EntityUtil.getEntityById(categoryRepository, id, "Category");
+		logger.debug("Successfully retrieved category with ID: {}", id);
+		if (fromMenuService) {
+			return category;
+		}
+		return DtoUtil.map(category, CategoryDto.class, modelMapper);
 	}
 }
