@@ -20,7 +20,7 @@ Before running the project, ensure you have the following installed:
 - Build Tool
 	- Apache Maven (Version 3.x)
 - Database
-	- MySQL (Version 8)
+	- PostgreSQL (Version 16)
 - Version Control System
   - Git (Latest stable version)
     
