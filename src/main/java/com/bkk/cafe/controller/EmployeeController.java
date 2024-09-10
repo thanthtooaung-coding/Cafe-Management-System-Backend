@@ -20,11 +20,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bkk.cafe.dto.EmployeeDto;
 import com.bkk.cafe.service.EmployeeService;
 import com.bkk.cafe.util.response.ApiResponse;
+import com.bkk.cafe.util.response.PaginationResponse;
 import com.bkk.cafe.util.response.ResponseUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,6 +72,25 @@ public class EmployeeController {
 		logger.info("Employees fetched successfully. Total employees: {}", employees.size());
 		return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employees fetched successfully", employees);
 	}
+	
+	@GetMapping("/page")
+    @Operation(summary = "Get employees with pagination", description = "Retrieve a paginated list of employees.")
+    public ResponseEntity<ApiResponse<PaginationResponse<EmployeeDto>>> getEmployeesWithPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "") String search) {
+
+        logger.info("Fetching employees - Page: {}, Size: {}, Search: {}", page, size, search);
+        PaginationResponse<EmployeeDto> paginationResponse = employeeService.getEmployeesWithPagination(page, size, search);
+
+        if (paginationResponse.getContent().isEmpty()) {
+            logger.info("No employees found for the requested page: {}", page);
+            return ResponseUtil.createSuccessResponse(HttpStatus.OK, "No employees found", paginationResponse);
+        }
+
+        logger.info("Employees fetched successfully.");
+        return ResponseUtil.createSuccessResponse(HttpStatus.OK, "Employees fetched successfully", paginationResponse);
+    }
 
 	@PutMapping("/{staffId}")
 	@Operation(summary = "Update an existing employee", description = "Update an existing employee. The response is updated Employee object with id, staffId, name, position, email, phoneNumber, hireDate.")

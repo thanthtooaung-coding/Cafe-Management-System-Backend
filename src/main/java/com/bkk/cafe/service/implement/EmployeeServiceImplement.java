@@ -8,11 +8,12 @@ package com.bkk.cafe.service.implement;
 
 import java.util.List;
 
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.bkk.cafe.dto.EmployeeDto;
@@ -23,6 +24,9 @@ import com.bkk.cafe.repository.EmployeeRepository;
 import com.bkk.cafe.service.EmployeeService;
 import com.bkk.cafe.util.DtoUtil;
 import com.bkk.cafe.util.EntityUtil;
+import com.bkk.cafe.util.response.PaginationResponse;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -105,4 +109,42 @@ public class EmployeeServiceImplement implements EmployeeService {
 		employeeRepository.delete(employee);
 		logger.debug("Employee with Staff ID: {} deleted from the database", staffId);
 	}
+
+	@Override
+	public PaginationResponse<EmployeeDto> getEmployeesWithPagination(int page, int size, String search) {
+	    logger.debug("Attempting to retrieve employees with pagination - Page: {}, Size: {}, Search: {}", page, size, search);
+
+	    Pageable pageable = PageRequest.of(page, size);
+	    Page<Employee> employeePage;
+
+	    if (search == null || search.trim().isEmpty()) {
+	        employeePage = employeeRepository.findAll(pageable);
+	    } else {
+	        employeePage = employeeRepository.searchEmployees(search, pageable);
+	    }
+
+	    logger.debug("Retrieved {} employees for Page: {}, Size: {}", employeePage.getNumberOfElements(), page, size);
+	    logger.debug("Pagination metadata - Total Pages: {}, Total Elements: {}", employeePage.getTotalPages(), employeePage.getTotalElements());
+
+	    List<EmployeeDto> employeeDtos = employeePage.map(employee -> {
+	        EmployeeDto employeeDto = modelMapper.map(employee, EmployeeDto.class);
+	        employeeDto.setId(null);
+	        return employeeDto;
+	    }).getContent();
+
+	    logger.debug("Mapped {} Employee entities to EmployeeDto objects", employeeDtos.size());
+
+	    PaginationResponse<EmployeeDto> response = PaginationResponse.<EmployeeDto>builder()
+    	    .content(employeeDtos)
+    	    .pageNumber(employeePage.getNumber())
+    	    .pageSize(employeePage.getSize())
+    	    .totalElements(employeePage.getTotalElements())
+    	    .totalPages(employeePage.getTotalPages())
+    	    .build();
+
+	    logger.debug("Successfully constructed PaginationResponse with Page Number: {}, Page Size: {}", response.getPageNumber(), response.getPageSize());
+
+	    return response;
+	}
+
 }

@@ -10,6 +10,8 @@ import java.util.List;
 
 import com.bkk.cafe.dto.EmployeeDto;
 
+import com.bkk.cafe.util.response.PaginationResponse;
+
 public interface EmployeeService {
 	EmployeeDto createEmployee(EmployeeDto employeeDto);
 
@@ -20,4 +22,6 @@ public interface EmployeeService {
 	EmployeeDto updateEmployee(String staffId, EmployeeDto employeeDto);
 
 	void deleteEmployee(String staffId);
+
+	PaginationResponse<EmployeeDto> getEmployeesWithPagination(int page, int size, String search);
 }
